@@ -1,4 +1,4 @@
-package com.baggage.config;
+package com.baggage.kafka.config;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
