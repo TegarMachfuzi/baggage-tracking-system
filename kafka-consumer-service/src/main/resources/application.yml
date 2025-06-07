@@ -1,0 +1,17 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092  # Gunakan nama service Kafka di Docker network
+    consumer:
+      group-id: my-group-id
+      auto-offset-reset: earliest
+      properties:
+        security.protocol: SASL_PLAINTEXT
+        sasl.mechanism: PLAIN
+        sasl.jaas.config: >
+          org.apache.kafka.common.security.plain.PlainLoginModule required
+          username="kafka"
+          password="kafka-secret";
+
+kafka:
+  username: kafka
+  password: kafka-secret
