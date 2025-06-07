@@ -1,9 +1,11 @@
 package com.baggage.dto;
 
+import java.util.UUID;
+
 public class BaggageDto {
-    private String baggageId;
+    private UUID baggageId;
     private String barcode;
-    private String passengerId;
+    private UUID passengerId;
     private String flightNumber;
     private String origin;
     private String destination;
@@ -13,12 +15,20 @@ public class BaggageDto {
     //Relasi passanger dan tracking
 
 
-    public String getBaggageId() {
+    public UUID getBaggageId() {
         return baggageId;
     }
 
-    public void setBaggageId(String baggageId) {
+    public void setBaggageId(UUID baggageId) {
         this.baggageId = baggageId;
+    }
+
+    public UUID getPassengerId() {
+        return passengerId;
+    }
+
+    public void setPassengerId(UUID passengerId) {
+        this.passengerId = passengerId;
     }
 
     public String getBarcode() {
@@ -59,14 +69,6 @@ public class BaggageDto {
 
     public void setOrigin(String origin) {
         this.origin = origin;
-    }
-
-    public String getPassengerId() {
-        return passengerId;
-    }
-
-    public void setPassengerId(String passengerId) {
-        this.passengerId = passengerId;
     }
 
     public String getStatus() {
