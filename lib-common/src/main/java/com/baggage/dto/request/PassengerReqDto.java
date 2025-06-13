@@ -1,10 +1,8 @@
-package com.baggage.dto;
-
-import jakarta.persistence.*;
+package com.baggage.dto.request;
 
 import java.util.UUID;
 
-public class PassengerDto {
+public class PassengerReqDto {
 
     private UUID id;
 
@@ -18,7 +16,7 @@ public class PassengerDto {
 
     private String flightInfo;
 
-    public PassengerDto(String bookingRef, String email, String flightInfo, UUID id, String name, String phone) {
+    public PassengerReqDto(String bookingRef, String email, String flightInfo, UUID id, String name, String phone) {
         this.bookingRef = bookingRef;
         this.email = email;
         this.flightInfo = flightInfo;
@@ -27,7 +25,7 @@ public class PassengerDto {
         this.phone = phone;
     }
 
-    public PassengerDto() {
+    public PassengerReqDto() {
 
     }
 

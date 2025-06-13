@@ -1,8 +1,8 @@
-package com.baggage.dto;
+package com.baggage.dto.request;
 
 import java.util.UUID;
 
-public class BaggageDto {
+public class BaggageReqDto {
     private UUID baggageId;
     private String barcode;
     private UUID passengerId;
