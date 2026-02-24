@@ -10,6 +10,7 @@ import com.baggage.model.BaggageEntity;
 import com.baggage.repository.BaggageRepository;
 import com.baggage.util.BarcodeGenerator;
 import com.baggage.util.ValidationUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -32,6 +33,9 @@ public class BaggageServiceImpl {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String CACHE_KEY_PREFIX = "baggage:";
     private static final String CACHE_KEY_BARCODE_PREFIX = "baggage:barcode:";
@@ -68,10 +72,11 @@ public class BaggageServiceImpl {
     public BaggageResDto getById(UUID id) {
         // Try cache first
         String cacheKey = CACHE_KEY_PREFIX + id;
-        BaggageResDto cached = (BaggageResDto) redisTemplate.opsForValue().get(cacheKey);
+        Object cached = redisTemplate.opsForValue().get(cacheKey);
         
         if (cached != null) {
-            return cached; // Cache HIT
+            // Convert from LinkedHashMap to BaggageResDto
+            return objectMapper.convertValue(cached, BaggageResDto.class);
         }
 
         // Cache MISS - query database
@@ -89,10 +94,11 @@ public class BaggageServiceImpl {
     public BaggageResDto getByBarcode(String barcode) {
         // Try cache first
         String cacheKey = CACHE_KEY_BARCODE_PREFIX + barcode;
-        BaggageResDto cached = (BaggageResDto) redisTemplate.opsForValue().get(cacheKey);
+        Object cached = redisTemplate.opsForValue().get(cacheKey);
         
         if (cached != null) {
-            return cached; // Cache HIT
+            // Convert from LinkedHashMap to BaggageResDto
+            return objectMapper.convertValue(cached, BaggageResDto.class);
         }
 
         // Cache MISS - query database
