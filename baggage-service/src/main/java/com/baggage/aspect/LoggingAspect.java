@@ -39,7 +39,7 @@ public class LoggingAspect {
             return result;
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
-            log.error("✗ {}.{}() - Error: {} - Duration: {}ms", className, methodName, e.getMessage(), duration);
+            log.error("✗ {}.{}() - Error: {} - Duration: {}ms", className, methodName, e.getMessage(), duration, e);
             throw e;
         }
     }
@@ -49,6 +49,6 @@ public class LoggingAspect {
         log.error("Exception in {}.{}() - Message: {}", 
             joinPoint.getSignature().getDeclaringTypeName(),
             joinPoint.getSignature().getName(),
-            ex.getMessage());
+            ex.getMessage(), ex);
     }
 }

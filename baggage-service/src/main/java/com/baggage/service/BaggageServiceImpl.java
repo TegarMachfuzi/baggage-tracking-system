@@ -182,22 +182,27 @@ public class BaggageServiceImpl {
     }
 
     private void publishBaggageEvent(BaggageEntity entity, String eventType) {
-        BaggageEventDto event = new BaggageEventDto();
-        event.setBaggageId(entity.getId());
-        event.setBarcode(entity.getBarcode());
-        event.setPassengerId(entity.getPassengerId());
-        event.setFlightNumber(entity.getFlightNumber());
-        event.setOrigin(entity.getOrigin());
-        event.setDestination(entity.getDestination());
-        event.setStatus(entity.getStatus());
-        event.setTimestamp(LocalDateTime.now());
-        event.setEventType(eventType);
+        try {
+            BaggageEventDto event = new BaggageEventDto();
+            event.setBaggageId(entity.getId());
+            event.setBarcode(entity.getBarcode());
+            event.setPassengerId(entity.getPassengerId());
+            event.setFlightNumber(entity.getFlightNumber());
+            event.setOrigin(entity.getOrigin());
+            event.setDestination(entity.getDestination());
+            event.setStatus(entity.getStatus());
+            event.setTimestamp(LocalDateTime.now());
+            event.setEventType(eventType);
 
-        String topic = eventType.equals("CREATED") 
-            ? KafkaTopicConfig.BAGGAGE_CREATED_TOPIC 
-            : KafkaTopicConfig.BAGGAGE_UPDATED_TOPIC;
+            String topic = eventType.equals("CREATED") 
+                ? KafkaTopicConfig.BAGGAGE_CREATED_TOPIC 
+                : KafkaTopicConfig.BAGGAGE_UPDATED_TOPIC;
 
-        kafkaTemplate.send(topic, event);
+            kafkaTemplate.send(topic, event);
+        } catch (Exception e) {
+            // Log but don't fail if Kafka is not available
+            System.err.println("Kafka not available: " + e.getMessage());
+        }
     }
 
     private void cacheData(UUID id, String barcode, BaggageResDto dto) {
