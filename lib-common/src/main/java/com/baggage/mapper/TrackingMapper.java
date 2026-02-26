@@ -1,5 +1,6 @@
 package com.baggage.mapper;
 
+import com.baggage.dto.request.TrackingReqDto;
 import com.baggage.dto.response.TrackingResDto;
 import com.baggage.model.TrackingEntity;
 
@@ -27,6 +28,17 @@ public class TrackingMapper {
         entity.setLocation(dto.getLocation());
         entity.setStatus(dto.getStatus());
         entity.setTimestamp(dto.getTimestamp());
+        entity.setRemarks(dto.getRemarks());
+        return entity;
+    }
+
+    public static TrackingEntity toEntity(TrackingReqDto dto) {
+        if (dto == null) return null;
+        
+        TrackingEntity entity = new TrackingEntity();
+        entity.setBaggageId(dto.getBaggageId());
+        entity.setLocation(dto.getLocation());
+        entity.setStatus(dto.getStatus());
         entity.setRemarks(dto.getRemarks());
         return entity;
     }
