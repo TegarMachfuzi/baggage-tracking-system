@@ -1,5 +1,6 @@
 package com.baggage.mapper;
 
+import com.baggage.dto.request.ClaimReqDto;
 import com.baggage.dto.response.ClaimResDto;
 import com.baggage.model.ClaimEntity;
 
@@ -32,6 +33,17 @@ public class ClaimMapper {
         entity.setDescription(dto.getDescription());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setResolvedAt(dto.getResolvedAt());
+        return entity;
+    }
+    
+    public static ClaimEntity toEntity(ClaimReqDto dto) {
+        if (dto == null) return null;
+        
+        ClaimEntity entity = new ClaimEntity();
+        entity.setBaggageId(dto.getBaggageId());
+        entity.setPassengerId(dto.getPassengerId());
+        entity.setClaimType(dto.getClaimType());
+        entity.setDescription(dto.getDescription());
         return entity;
     }
 }
