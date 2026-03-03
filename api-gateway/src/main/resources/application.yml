@@ -1,0 +1,153 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+    
+  main:
+    web-application-type: reactive
+    
+  security:
+    user:
+      name: admin
+      password: admin
+    
+  cloud:
+    gateway:
+      routes:
+        # Baggage Service
+        - id: baggage-service
+          uri: lb://baggage-service
+          predicates:
+            - Path=/api/baggage/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: baggageCircuitBreaker
+                fallbackUri: forward:/fallback/baggage
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
+            
+        # Passenger Service
+        - id: passenger-service
+          uri: lb://passenger-service
+          predicates:
+            - Path=/api/passenger/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: passengerCircuitBreaker
+                fallbackUri: forward:/fallback/passenger
+            
+        # Tracking Service
+        - id: tracking-service
+          uri: lb://tracking-service
+          predicates:
+            - Path=/api/tracking/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: trackingCircuitBreaker
+                fallbackUri: forward:/fallback/tracking
+            
+        # Claim Service
+        - id: claim-service
+          uri: lb://claim-service
+          predicates:
+            - Path=/api/claim/**
+          filters:
+            - StripPrefix=0
+            - name: CircuitBreaker
+              args:
+                name: claimCircuitBreaker
+                fallbackUri: forward:/fallback/claim
+            
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+# Eureka Client Configuration
+eureka:
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# Resilience4j Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      baggageCircuitBreaker:
+        base-config: default
+      passengerCircuitBreaker:
+        base-config: default
+      trackingCircuitBreaker:
+        base-config: default
+      claimCircuitBreaker:
+        base-config: default
+        
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s
+
+# Distributed Tracing with Zipkin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,circuitbreakers,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# JWT Configuration
+jwt:
+  secret: mySecretKeyForBaggageTrackingSystemThatIsLongEnough
+  expiration: 86400000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+    io.github.resilience4j: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
