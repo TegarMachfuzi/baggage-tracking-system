@@ -1,17 +1,38 @@
-spring:
-  kafka:
-    bootstrap-servers: kafka:9092  # Gunakan nama service Kafka di Docker network
-    consumer:
-      group-id: my-group-id
-      auto-offset-reset: earliest
-      properties:
-        security.protocol: SASL_PLAINTEXT
-        sasl.mechanism: PLAIN
-        sasl.jaas.config: >
-          org.apache.kafka.common.security.plain.PlainLoginModule required
-          username="kafka"
-          password="kafka-secret";
+server:
+  port: 8086
 
-kafka:
-  username: kafka
-  password: kafka-secret
+spring:
+  application:
+    name: kafka-consumer-service
+    
+  cloud:
+    discovery:
+      enabled: false
+      
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: baggage-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+      
+logging:
+  level:
+    com.baggage: INFO
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    com.netflix: ERROR
