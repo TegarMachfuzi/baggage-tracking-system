@@ -4,13 +4,13 @@ server:
 spring:
   application:
     name: claim-service
-    
+
   datasource:
     url: jdbc:postgresql://localhost:5432/claim_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-    
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,30 +19,26 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-    
+
   kafka:
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      
+
   data:
     redis:
       host: localhost
       port: 6379
-      
-  cloud:
-    discovery:
-      enabled: false
 
 eureka:
   client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
 
 logging:
   level:
     com.baggage: INFO
-    org.springframework.web: INFO
     org.hibernate.SQL: DEBUG

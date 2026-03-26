@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer-service
+  labels:
+    app: kafka-consumer-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-consumer-service
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer-service
+    spec:
+      containers:
+      - name: kafka-consumer-service
+        image: kafka-consumer-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8086
+        env:
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: SPRING_DATA_REDIS_HOST
+          value: "redis"
+        - name: SPRING_DATA_REDIS_PORT
+          value: "6379"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-consumer-service
+  labels:
+    app: kafka-consumer-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8086
+    targetPort: 8086
+    protocol: TCP
+  selector:
+    app: kafka-consumer-service

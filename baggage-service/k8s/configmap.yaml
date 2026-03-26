@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  password: postgres
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: baggage-service-config
+data:
+  application.properties: |
+    server.port=8081
+    spring.application.name=baggage-service
+    
+    # Database
+    spring.datasource.url=${SPRING_DATASOURCE_URL}
+    spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+    spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+    spring.jpa.hibernate.ddl-auto=update
+    
+    # Kafka
+    spring.kafka.bootstrap-servers=${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    
+    # Redis
+    spring.data.redis.host=${SPRING_DATA_REDIS_HOST}
+    spring.data.redis.port=${SPRING_DATA_REDIS_PORT}
+    
+    # Logging
+    logging.level.com.baggage=INFO

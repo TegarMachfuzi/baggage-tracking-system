@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: passenger-service-config
+data:
+  application.properties: |
+    server.port=8082
+    spring.application.name=passenger-service
+    spring.datasource.url=${SPRING_DATASOURCE_URL}
+    spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+    spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+    spring.jpa.hibernate.ddl-auto=update
+    spring.kafka.bootstrap-servers=${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    spring.data.redis.host=${SPRING_DATA_REDIS_HOST}
+    spring.data.redis.port=${SPRING_DATA_REDIS_PORT}
+    logging.level.com.passenger=INFO

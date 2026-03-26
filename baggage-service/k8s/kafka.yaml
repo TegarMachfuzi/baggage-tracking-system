@@ -1,0 +1,102 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
+        command:
+        - sh
+        - -c
+        - "bin/zookeeper-server-start.sh config/zookeeper.properties"
+        ports:
+        - containerPort: 2181
+        env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  type: ClusterIP
+  ports:
+  - port: 2181
+    targetPort: 2181
+    protocol: TCP
+  selector:
+    app: zookeeper
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
+        command:
+        - sh
+        - -c
+        - "bin/kafka-server-start.sh config/server.properties --override broker.id=1 --override zookeeper.connect=zookeeper:2181 --override listeners=PLAINTEXT://:9092 --override advertised.listeners=PLAINTEXT://kafka:9092 --override log.dirs=/tmp/kafka-logs"
+        ports:
+        - containerPort: 9092
+        env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9092
+    targetPort: 9092
+    protocol: TCP
+  selector:
+    app: kafka

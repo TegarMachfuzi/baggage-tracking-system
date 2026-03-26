@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "passenger-service-api",
+		"name": "Passenger Service API",
+		"description": "API collection for Passenger Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/actuator/health",
+					"host": ["{{base_url}}"],
+					"path": ["actuator", "health"]
+				}
+			}
+		},
+		{
+			"name": "Create Passenger",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+628123456789\",\n  \"passportNumber\": \"A12345678\",\n  \"nationality\": \"Indonesia\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/passengers",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers"]
+				}
+			}
+		},
+		{
+			"name": "Get All Passengers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/passengers",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers"]
+				}
+			}
+		},
+		{
+			"name": "Get Passenger by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/passengers/{{passenger_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers", "{{passenger_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Update Passenger",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+628123456789\",\n  \"passportNumber\": \"A12345678\",\n  \"nationality\": \"Indonesia\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/passengers/{{passenger_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers", "{{passenger_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Delete Passenger",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/passengers/{{passenger_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers", "{{passenger_id}}"]
+				}
+			}
+		},
+		{
+			"name": "Create Passenger - Validation Error",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\",\n  \"passportNumber\": \"\",\n  \"nationality\": \"\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/passengers",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers"]
+				}
+			}
+		},
+		{
+			"name": "Create Passenger - Duplicate Email",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+628987654321\",\n  \"passportNumber\": \"B87654321\",\n  \"nationality\": \"Indonesia\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/passengers",
+					"host": ["{{base_url}}"],
+					"path": ["api", "passengers"]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://passenger-service-tegar20-dev.apps.rm3.7wse.p1.openshiftapps.com",
+			"type": "string"
+		},
+		{
+			"key": "passenger_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

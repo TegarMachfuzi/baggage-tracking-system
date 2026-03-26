@@ -14,57 +14,59 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
-    
+
     @Autowired
     private JwtUtil jwtUtil;
-    
+
+    // Public paths that don't require JWT
     private static final List<String> PUBLIC_PATHS = List.of(
-        "/api/auth/login",
-        "/api/auth/register",
-        "/actuator/health"
+        "/api/users/login",
+        "/api/users/register",
+        "/api/users/validate",
+        "/api/baggage",
+        "/api/passenger",
+        "/api/tracking",
+        "/api/claim",
+        "/actuator"
     );
-    
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getPath().toString();
-        
-        // Skip authentication for public paths
+
         if (isPublicPath(path)) {
             return chain.filter(exchange);
         }
-        
-        // Extract token from Authorization header
+
         String authHeader = request.getHeaders().getFirst("Authorization");
-        
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-        
+
         String token = authHeader.substring(7);
-        
-        // Validate token
+
         if (!jwtUtil.validateToken(token)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-        
-        // Add username to request header
+
         String username = jwtUtil.extractUsername(token);
         ServerHttpRequest modifiedRequest = request.mutate()
                 .header("X-User-Id", username)
                 .build();
-        
+
         return chain.filter(exchange.mutate().request(modifiedRequest).build());
     }
-    
+
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
     }
-    
+
     @Override
     public int getOrder() {
-        return -100; // Execute before other filters
+        return -100;
     }
 }

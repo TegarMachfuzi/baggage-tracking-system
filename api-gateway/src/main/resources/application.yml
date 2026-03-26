@@ -16,6 +16,14 @@ spring:
   cloud:
     gateway:
       routes:
+        # User Service
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=0
+
         # Baggage Service
         - id: baggage-service
           uri: lb://baggage-service
@@ -72,14 +80,10 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+            allowedHeaders: ["*"]
+            allowCredentials: true
             
       discovery:
         locator:

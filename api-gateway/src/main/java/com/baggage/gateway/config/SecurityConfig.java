@@ -16,7 +16,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeExchange()
                 .pathMatchers("/api/auth/**", "/actuator/**", "/fallback/**").permitAll()
-                .anyExchange().authenticated()
+                .anyExchange().permitAll()
             .and()
             .httpBasic().disable()
             .formLogin().disable();

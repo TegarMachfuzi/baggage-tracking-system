@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "Baggage Service API",
+    "description": "API collection for testing Baggage Service endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Baggage",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"passengerId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"flightNumber\": \"GA123\",\n  \"origin\": \"CGK\",\n  \"destination\": \"DPS\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/baggage",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage"]
+        }
+      }
+    },
+    {
+      "name": "Get Baggage by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/{{baggageId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "{{baggageId}}"]
+        }
+      }
+    },
+    {
+      "name": "Get Baggage by Barcode",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/barcode/BAG20260224A1B2C3",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "barcode", "BAG20260224A1B2C3"]
+        }
+      }
+    },
+    {
+      "name": "Get Baggage by Passenger ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/passenger/{{passengerId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "passenger", "{{passengerId}}"]
+        }
+      }
+    },
+    {
+      "name": "Get Baggage by Flight Number",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/flight/GA123",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "flight", "GA123"]
+        }
+      }
+    },
+    {
+      "name": "Get All Baggage",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage"]
+        }
+      }
+    },
+    {
+      "name": "Update Baggage",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"passengerId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"flightNumber\": \"GA456\",\n  \"origin\": \"CGK\",\n  \"destination\": \"SUB\",\n  \"status\": \"IN_TRANSIT\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/{{baggageId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "{{baggageId}}"]
+        }
+      }
+    },
+    {
+      "name": "Update Baggage Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/{{baggageId}}/status?status=IN_TRANSIT",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "{{baggageId}}", "status"],
+          "query": [
+            {
+              "key": "status",
+              "value": "IN_TRANSIT"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Baggage",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/baggage/{{baggageId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8081",
+          "path": ["api", "baggage", "{{baggageId}}"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baggageId",
+      "value": "123e4567-e89b-12d3-a456-426614174000",
+      "type": "string"
+    },
+    {
+      "key": "passengerId",
+      "value": "123e4567-e89b-12d3-a456-426614174000",
+      "type": "string"
+    }
+  ]
+}
