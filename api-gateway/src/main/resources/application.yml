@@ -45,7 +45,7 @@ spring:
         - id: passenger-service
           uri: lb://passenger-service
           predicates:
-            - Path=/api/passenger/**
+            - Path=/api/passengers/**
           filters:
             - StripPrefix=0
             - name: CircuitBreaker
@@ -76,14 +76,6 @@ spring:
               args:
                 name: claimCircuitBreaker
                 fallbackUri: forward:/fallback/claim
-            
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:3000"
-            allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-            allowedHeaders: ["*"]
-            allowCredentials: true
             
       discovery:
         locator:

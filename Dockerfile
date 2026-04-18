@@ -1,5 +1,5 @@
 # Gunakan base image OpenJDK (sesuaikan versi Java dengan projectmu)
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 
 # Buat direktori aplikasi di dalam container
 WORKDIR /app

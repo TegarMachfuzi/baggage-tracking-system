@@ -5,18 +5,18 @@ echo "  Baggage Tracking System - Setup"
 echo "=========================================="
 echo ""
 
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running. Please start Docker first."
+# Check if Podman is running
+if ! podman info > /dev/null 2>&1; then
+    echo "❌ Podman is not running. Please start Podman first."
     exit 1
 fi
 
-echo "✅ Docker is running"
+echo "✅ Podman is running"
 echo ""
 
 # Start infrastructure
 echo "🚀 Starting infrastructure services..."
-docker-compose up -d
+podman-compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
@@ -25,7 +25,7 @@ sleep 10
 # Check services
 echo ""
 echo "📊 Checking services status..."
-docker-compose ps
+podman-compose ps
 
 echo ""
 echo "=========================================="

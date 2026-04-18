@@ -24,6 +24,17 @@ jwt:
   secret: mySecretKeyForBaggageTrackingSystemThatIsLongEnough
   expiration: 86400000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  security:
+    enabled: false
+
 logging:
   level:
     com.baggage: INFO

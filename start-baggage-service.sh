@@ -3,19 +3,19 @@
 echo "🚀 Starting Baggage Tracking System..."
 echo ""
 
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running. Please start Docker first."
+# Check if Podman is running
+if ! podman info > /dev/null 2>&1; then
+    echo "❌ Podman is not running. Please start Podman first."
     exit 1
 fi
 
-echo "✅ Docker is running"
+echo "✅ Podman is running"
 echo ""
 
 # Start infrastructure
 echo "📦 Starting infrastructure services..."
-cd "/Users/m/Documents/Personal Project/baggage-tracking-system"
-docker compose up -d
+cd "/Users/tegarmachfudzi/Documents/Personal Projek/baggage-tracking-system"
+podman-compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready (15 seconds)..."
@@ -23,7 +23,7 @@ sleep 15
 
 echo ""
 echo "📊 Infrastructure status:"
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "postgres|kafka|redis|zookeeper"
+podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "postgres|kafka|redis|zookeeper"
 
 echo ""
 echo "✅ Infrastructure ready!"
