@@ -8,7 +8,10 @@ import com.baggage.mapper.TrackingMapper;
 import com.baggage.model.TrackingEntity;
 import com.baggage.repository.TrackingRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class TrackingServiceImpl {
 
+    private static final Logger log = LoggerFactory.getLogger(TrackingServiceImpl.class);
+
     @Autowired
     private TrackingRepository repository;
 
@@ -34,6 +39,12 @@ public class TrackingServiceImpl {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${baggage.service.url:http://baggage-service:8081}")
+    private String baggageServiceUrl;
 
     private static final String CACHE_KEY_LATEST = "tracking:latest:";
     private static final String CACHE_KEY_HISTORY = "tracking:history:";
@@ -91,24 +102,36 @@ public class TrackingServiceImpl {
     }
 
     public TrackingResDto getLatestByBaggageId(UUID baggageId) {
-        // Try cache first
         String cacheKey = CACHE_KEY_LATEST + baggageId;
         Object cached = redisTemplate.opsForValue().get(cacheKey);
-        
-        if (cached != null) {
-            return objectMapper.convertValue(cached, TrackingResDto.class);
-        }
+        if (cached != null) return objectMapper.convertValue(cached, TrackingResDto.class);
 
-        // Cache miss - query database
         TrackingEntity entity = repository.findFirstByBaggageIdOrderByTimestampDesc(baggageId)
                 .orElseThrow(() -> new RuntimeException("No tracking found for baggage"));
-        
         TrackingResDto dto = TrackingMapper.toDto(entity);
-        
-        // Store in cache
         redisTemplate.opsForValue().set(cacheKey, dto, CACHE_TTL_HOURS, TimeUnit.HOURS);
-        
         return dto;
+    }
+
+    public List<TrackingResDto> getByBarcode(String barcode) {
+        UUID baggageId = getBaggageIdByBarcode(barcode);
+        return getByBaggageId(baggageId);
+    }
+
+    public TrackingResDto getLatestByBarcode(String barcode) {
+        UUID baggageId = getBaggageIdByBarcode(barcode);
+        return getLatestByBaggageId(baggageId);
+    }
+
+    private UUID getBaggageIdByBarcode(String barcode) {
+        try {
+            String url = baggageServiceUrl + "/api/baggage/barcode/" + barcode;
+            String response = restTemplate.getForObject(url, String.class);
+            com.fasterxml.jackson.databind.JsonNode data = objectMapper.readTree(response).get("data");
+            return UUID.fromString(data.get("id").asText());
+        } catch (Exception e) {
+            throw new RuntimeException("Baggage not found for barcode: " + barcode);
+        }
     }
 
     private void publishTrackingEvent(TrackingEntity entity) {
@@ -120,20 +143,20 @@ public class TrackingServiceImpl {
             event.setStatus(entity.getStatus());
             event.setTimestamp(entity.getTimestamp());
             event.setRemarks(entity.getRemarks());
-
             kafkaTemplate.send(KafkaTopicConfig.TRACKING_UPDATED_TOPIC, event);
         } catch (Exception e) {
-            System.err.println("Kafka not available: " + e.getMessage());
+            log.error("Kafka not available: {}", e.getMessage());
         }
     }
 
     private void updateBaggageStatus(UUID baggageId, String status) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8081/api/baggage/" + baggageId + "/status?status=" + status;
+            String url = baggageServiceUrl + "/api/baggage/" + baggageId + "/status?status=" + status;
+            log.info("Updating baggage status: {}", url);
             restTemplate.patchForObject(url, null, String.class);
+            log.info("Baggage status updated: baggageId={}, status={}", baggageId, status);
         } catch (Exception e) {
-            System.err.println("Failed to update baggage status: " + e.getMessage());
+            log.error("Failed to update baggage status: {}", e.getMessage());
         }
     }
 }

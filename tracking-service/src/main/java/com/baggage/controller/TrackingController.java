@@ -37,9 +37,21 @@ public class TrackingController {
         return ResponseEntity.ok(ResponseUtil.success(result));
     }
 
+    @GetMapping("/barcode/{barcode}")
+    public ResponseEntity<ResponseModel> getByBarcode(@PathVariable String barcode) {
+        List<TrackingResDto> result = service.getByBarcode(barcode);
+        return ResponseEntity.ok(ResponseUtil.success(result));
+    }
+
     @GetMapping("/latest/{baggageId}")
     public ResponseEntity<ResponseModel> getLatest(@PathVariable UUID baggageId) {
         TrackingResDto result = service.getLatestByBaggageId(baggageId);
+        return ResponseEntity.ok(ResponseUtil.success(result));
+    }
+
+    @GetMapping("/latest/barcode/{barcode}")
+    public ResponseEntity<ResponseModel> getLatestByBarcode(@PathVariable String barcode) {
+        TrackingResDto result = service.getLatestByBarcode(barcode);
         return ResponseEntity.ok(ResponseUtil.success(result));
     }
 }

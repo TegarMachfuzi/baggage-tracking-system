@@ -12,9 +12,13 @@ import com.baggage.util.BarcodeGenerator;
 import com.baggage.util.ValidationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,13 +45,24 @@ public class BaggageServiceImpl {
     private static final String CACHE_KEY_BARCODE_PREFIX = "baggage:barcode:";
     private static final long CACHE_TTL_HOURS = 24;
 
+    @Value("${passenger.service.url:http://passenger-service:8082}")
+    private String passengerServiceUrl;
+
     public BaggageResDto create(BaggageReqDto request) {
-        // Validate
         if (!ValidationUtil.isValidUUID(request.getPassengerId().toString())) {
             throw new IllegalArgumentException("Invalid passenger ID");
         }
         if (ValidationUtil.isEmpty(request.getFlightNumber())) {
             throw new IllegalArgumentException("Flight number is required");
+        }
+
+        // Validate passenger exists
+        try {
+            RestTemplate restTemplate = new RestTemplate(
+                new HttpComponentsClientHttpRequestFactory(HttpClients.createDefault()));
+            restTemplate.getForObject(passengerServiceUrl + "/api/passengers/" + request.getPassengerId(), String.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Passenger not found: " + request.getPassengerId());
         }
 
         // Generate barcode

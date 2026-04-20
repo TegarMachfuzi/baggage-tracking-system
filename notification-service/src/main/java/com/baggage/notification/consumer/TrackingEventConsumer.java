@@ -63,7 +63,8 @@ public class TrackingEventConsumer {
                 event.getStatus()
             );
 
-            if (passengerEmail != null) emailService.sendEmail(passengerEmail, subject, body);
+            if (passengerEmail != null) emailService.sendEmail(passengerEmail, subject, body,
+                barcode != null ? barcode : null);
 
             String smsMessage = templateService.getTrackingUpdatedSms(
                 barcode != null ? barcode : event.getBaggageId().toString(),

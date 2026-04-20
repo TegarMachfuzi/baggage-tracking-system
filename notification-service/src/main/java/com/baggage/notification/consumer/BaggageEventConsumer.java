@@ -42,7 +42,7 @@ public class BaggageEventConsumer {
             String body = templateService.getBaggageCreatedEmailBody(
                 event.getBarcode(), event.getFlightNumber(), event.getDestination());
 
-            if (passengerEmail != null) emailService.sendEmail(passengerEmail, subject, body);
+            if (passengerEmail != null) emailService.sendEmail(passengerEmail, subject, body, event.getBarcode());
 
             String smsMessage = templateService.getBaggageCreatedSms(event.getBarcode(), event.getFlightNumber());
             if (passengerPhone != null) smsService.sendSms(passengerPhone, smsMessage);
