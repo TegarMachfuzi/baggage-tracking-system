@@ -132,8 +132,12 @@ services:
       - "8085:8085"
     environment:
       - SPRING_PROFILES_ACTIVE=container
+      - MAIL_USERNAME=${MAIL_USERNAME:-tegarmachfudzi99@gmail.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-tvgj xmqx upja elqc}
     depends_on:
       - kafka
+      - baggage-service
+      - passenger-service
 
   kafka-consumer-service:
     build:
