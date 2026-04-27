@@ -26,6 +26,11 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         "/actuator"
     );
 
+    // Paths only accessible by ADMIN
+    private static final List<String> ADMIN_ONLY_PATHS = List.of(
+        "/api/users/staff"
+    );
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -51,6 +56,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         String username = jwtUtil.extractUsername(token);
         String role = jwtUtil.extractRole(token);
+
+        if (isAdminOnlyPath(path) && !"ADMIN".equals(role)) {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
+
         ServerHttpRequest modifiedRequest = request.mutate()
                 .header("X-User-Id", username)
                 .header("X-User-Role", role != null ? role : "")
@@ -61,6 +72,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    private boolean isAdminOnlyPath(String path) {
+        return ADMIN_ONLY_PATHS.stream().anyMatch(path::startsWith);
     }
 
     @Override

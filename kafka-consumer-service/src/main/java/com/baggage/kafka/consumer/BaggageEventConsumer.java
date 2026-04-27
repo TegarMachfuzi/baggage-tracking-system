@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 @Component
 public class BaggageEventConsumer {
     
@@ -24,13 +22,9 @@ public class BaggageEventConsumer {
                 event.getBaggageId(), event.getBarcode());
         
         try {
-            // Cache baggage by ID
-            String cacheKey = "baggage:" + event.getBaggageId();
-            cacheService.cache(cacheKey, event, 1, TimeUnit.HOURS);
-            
-            // Cache baggage by barcode
-            String barcodeCacheKey = "baggage:barcode:" + event.getBarcode();
-            cacheService.cache(barcodeCacheKey, event, 1, TimeUnit.HOURS);
+            // Invalidate stale cache so baggage-service re-caches with correct BaggageResDto
+            cacheService.invalidate("baggage:" + event.getBaggageId());
+            cacheService.invalidate("baggage:barcode:" + event.getBarcode());
             
             log.info("Successfully processed baggage-created event");
         } catch (Exception e) {
@@ -44,17 +38,10 @@ public class BaggageEventConsumer {
                 event.getBaggageId(), event.getStatus());
         
         try {
-            // Invalidate old cache
             cacheService.invalidate("baggage:" + event.getBaggageId());
             cacheService.invalidate("baggage:barcode:" + event.getBarcode());
-            
-            // Invalidate related caches
             cacheService.invalidatePattern("baggage:passenger:" + event.getPassengerId() + "*");
             cacheService.invalidatePattern("baggage:flight:" + event.getFlightNumber() + "*");
-            
-            // Cache updated data
-            String cacheKey = "baggage:" + event.getBaggageId();
-            cacheService.cache(cacheKey, event, 1, TimeUnit.HOURS);
             
             log.info("Successfully processed baggage-updated event");
         } catch (Exception e) {

@@ -1,15 +1,11 @@
 package com.baggage.constant;
 
 public enum TrackingStatus {
-    CHECK_IN,
-    SECURITY_SCREENING,
+    CHECKED_IN,
+    SECURITY_CHECK,
     LOADING_TO_AIRCRAFT,
-    ON_BOARD,
-    IN_FLIGHT,
-    UNLOADING,
-    BAGGAGE_CLAIM,
-    COLLECTED,
-    TRANSFERRED,
-    DELAYED,
-    MISSING
+    IN_TRANSIT,
+    ARRIVED,
+    CUSTOMS_CHECK,
+    READY_FOR_PICKUP
 }

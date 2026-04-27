@@ -12,12 +12,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import com.baggage.constant.TrackingStatus;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/tracking")
 public class TrackingController {
 
     @Autowired
     private TrackingServiceImpl service;
+
+    private static final Map<String, String> STATUS_DEFAULT_LOCATIONS = Map.of(
+        TrackingStatus.CHECKED_IN.name(),          "Check-in Counter",
+        TrackingStatus.SECURITY_CHECK.name(),       "Security Screening Area",
+        TrackingStatus.LOADING_TO_AIRCRAFT.name(),  "Baggage Handling / Loading Bay",
+        TrackingStatus.IN_TRANSIT.name(),           "Aircraft Hold",
+        TrackingStatus.ARRIVED.name(),              "Arrival Baggage Area",
+        TrackingStatus.CUSTOMS_CHECK.name(),        "Customs & Immigration",
+        TrackingStatus.READY_FOR_PICKUP.name(),     "Baggage Claim Belt"
+    );
+
+    @GetMapping("/locations")
+    public ResponseEntity<ResponseModel> getDefaultLocations() {
+        return ResponseEntity.ok(ResponseUtil.success(STATUS_DEFAULT_LOCATIONS));
+    }
 
     @PostMapping
     public ResponseEntity<ResponseModel> create(@RequestBody TrackingReqDto request) {

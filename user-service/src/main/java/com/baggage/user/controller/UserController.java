@@ -14,10 +14,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    
+
     @Autowired
     private UserService service;
-    
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
@@ -26,7 +26,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("responseMessage", e.getMessage()));
         }
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
@@ -35,45 +35,44 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("responseMessage", e.getMessage()));
         }
     }
-    
+
+    // Only ADMIN can create ADMIN/STAFF accounts (protected via SecurityConfig)
+    @PostMapping("/staff")
+    public ResponseEntity<?> createStaff(@Valid @RequestBody CreateStaffRequest request) {
+        try {
+            return ResponseEntity.ok(service.createStaff(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("responseMessage", e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
-        UserResponse response = service.getUserById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getUserById(id));
     }
-    
+
     @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
-        UserResponse response = service.getUserByUsername(username);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getUserByUsername(username));
     }
-    
+
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> response = service.getAllUsers();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getAllUsers());
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
         service.deleteUser(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User deleted successfully");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("responseMessage", "User deleted successfully"));
     }
-    
+
     @PostMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            boolean isValid = service.validateToken(token);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("valid", isValid);
-            
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of("valid", service.validateToken(token)));
         }
-        
-        return ResponseEntity.badRequest().body("Invalid Authorization header");
+        return ResponseEntity.badRequest().body(Map.of("responseMessage", "Invalid Authorization header"));
     }
 }

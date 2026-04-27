@@ -30,6 +30,36 @@ public class UserService {
     @Autowired
     private PassengerClient passengerClient;
     
+    public UserResponse createStaff(CreateStaffRequest request) {
+        if (repository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (repository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        Role role;
+        try {
+            role = Role.valueOf(request.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role. Must be ADMIN or STAFF");
+        }
+        if (role == Role.USER) {
+            throw new RuntimeException("Cannot create USER via this endpoint. Use /register instead");
+        }
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhone());
+        user.setRole(role);
+        user.setEnabled(true);
+
+        return mapToResponse(repository.save(user));
+    }
+
     public AuthResponse register(RegisterRequest request) {
         if (repository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
