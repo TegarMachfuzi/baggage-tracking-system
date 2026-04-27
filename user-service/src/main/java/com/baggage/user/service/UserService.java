@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.baggage.user.client.PassengerClient;
+
 @Service
 public class UserService {
     
@@ -24,55 +26,59 @@ public class UserService {
     
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private PassengerClient passengerClient;
     
     public AuthResponse register(RegisterRequest request) {
-        // Check if username exists
         if (repository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        
-        // Check if email exists
         if (repository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+
+        // Create passenger record first, get passengerId
+        String passengerId = passengerClient.createPassenger(
+            request.getFullName(),
+            request.getEmail(),
+            request.getPhone(),
+            request.getPassportNumber(),
+            request.getNationality()
+        );
+        if (passengerId == null) {
+            throw new RuntimeException("Failed to create passenger record");
+        }
         
-        // Create user
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
         user.setPhone(request.getPhone());
+        user.setPassengerId(passengerId);
         user.setRole(Role.USER);
         user.setEnabled(true);
         
         user = repository.save(user);
         
-        // Generate token
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
-        
-        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getRole().name(), user.getPassengerId());
     }
     
     public AuthResponse login(LoginRequest request) {
-        // Find user
         User user = repository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
         
-        // Check password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
-        
-        // Check if enabled
         if (!user.getEnabled()) {
             throw new RuntimeException("Account is disabled");
         }
         
-        // Generate token
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
-        
-        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getRole().name(), user.getPassengerId());
     }
     
     public UserResponse getUserByUsername(String username) {

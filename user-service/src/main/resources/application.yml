@@ -24,6 +24,15 @@ jwt:
   secret: mySecretKeyForBaggageTrackingSystemThatIsLongEnough
   expiration: 86400000
 
+passenger:
+  service:
+    url: http://localhost:8082
+
+admin:
+  username: admin
+  password: admin123
+  email: admin@baggage.com
+
 management:
   endpoints:
     web:

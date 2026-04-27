@@ -28,6 +28,9 @@ public class User {
     
     private String phone;
     
+    @Column(name = "passenger_id")
+    private String passengerId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;

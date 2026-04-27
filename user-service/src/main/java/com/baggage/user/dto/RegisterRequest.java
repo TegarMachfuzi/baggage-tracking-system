@@ -24,4 +24,10 @@ public class RegisterRequest {
     private String fullName;
     
     private String phone;
+
+    @NotBlank(message = "Passport number is required")
+    private String passportNumber;
+
+    @NotBlank(message = "Nationality is required")
+    private String nationality;
 }

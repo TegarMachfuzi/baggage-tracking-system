@@ -23,10 +23,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         "/api/users/login",
         "/api/users/register",
         "/api/users/validate",
-        "/api/baggage",
-        "/api/passengers",
-        "/api/tracking",
-        "/api/claim",
         "/actuator"
     );
 
@@ -54,8 +50,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         String username = jwtUtil.extractUsername(token);
+        String role = jwtUtil.extractRole(token);
         ServerHttpRequest modifiedRequest = request.mutate()
                 .header("X-User-Id", username)
+                .header("X-User-Role", role != null ? role : "")
                 .build();
 
         return chain.filter(exchange.mutate().request(modifiedRequest).build());
